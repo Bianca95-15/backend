@@ -1,22 +1,27 @@
-const express = require ('express')
-const mysql = require ('mysql')
-const dotenv = require('dotenv')
-const nodemailer = require('nodemailer')
+const express = require('express');
+const dotenv = require('dotenv');
+dotenv.config();
 
-dotenv.config()
+const productRouter = require('./router/productRouter');
 
-const db = require('./config/dbConfig')
-const serviceProduct = require('./services/products/serviceProduct')
-const mailerService = require('./services/mailerService/mailerService')
+const app = express();
+const PORT = process.env.PORT || 3010;
 
-const app = express()
-const PORT = process.env.PORT || 3010
+app.use(express.json());
+app.use(express.static('public'));
 
+// Aquí irían otros middlewares como el CORS y la autenticación.
 
+app.use('/api/products', productRouter);
 
+// Gestión de errores centralizada.
+app.use((error, req, res, next) => {
+console.error(error);
+res.status(500).send('Internal Server Error');
+});
 
+app.listen(PORT, () => {
+console.log(`El servidor se está escuchando en http:` + `//localhost:' + ${PORT} `)
+});
 
-
-app.listen(PORT , () => {
-    console.log('El servidor se esta escuchando en http://localhost:' + PORT + '/')
-})
+module.exports = app;

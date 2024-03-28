@@ -1,8 +1,6 @@
 const { getProductById, createProduct, getAllProducts, deleteProductById } = require("../services/products/serviceProduct")
 
 
-
-
 const getProductByIdController = async (req, res) =>{
     const {pid} = req.params
     const result = await getProductById(pid)
@@ -22,7 +20,7 @@ const postProductController = async (req, res) =>{
     console.log(req.body)
     const {nombre, precio, stock, descripcion} = req.body
 
-    if (!nombre  !precio  !stock || !descripcion) {
+    if (!nombre , !precio , !stock || !descripcion) {
         return res.status(404).json({message: 'Bad request'})
     }
     const result = await createProduct({nombre, precio, descripcion, stock})
