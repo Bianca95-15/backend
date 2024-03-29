@@ -1,16 +1,27 @@
 const dbQueryAsync = require('../../config/dbConfig');
+const mailerService = require('../mailerService/mailerService')
+const { productCreatedTemplate } = require('../mailerService/templates/productMailTemplates')
 
-const createProduct = async ({pk_id_producto ,categoria, nombre, precio, descripcion }) => {
-    const query = 'INSERT INTO products (categoria, nombre, precio, descripcion) VALUES (?, ?, ?, ?)';
+const createProduct = async ({categoria, nombre, precio, descripcion }) => {
     try {
-        const result = await dbQueryAsync(query, [pk_id_producto ,categoria, nombre, precio, descripcion]);
-        console.log('El producto fue creado exitosamente');
+        const query = 'INSERT INTO products (categoria, nombre, precio, descripcion) VALUES (?,?,?,?)';
+        const result = await dbQueryAsync(query, [categoria, nombre, precio, descripcion ]);  
+        mailerService.transport.sendMail(
+            productCreatedTemplate('', 'admin', {categoria, nombre, precio, descripcion }), (error)=>{
+            if(error){
+                console.error('no se pudo enviar el mail');
+            }else{
+                console.log('Se envio el mail correctamente');
+            }
+        });
         return result;
-    } catch (error) {
-        console.error(error);
-        throw error;
     }
-};
+    catch(error){
+        console.error(error);
+        return false;
+    }
+}
+
 
 const getAllProducts = async () => {
     const query = 'SELECT * FROM products';
@@ -22,6 +33,7 @@ const getAllProducts = async () => {
         throw error;
     }
 };
+
 
 const getProductById = async (pid) => {
     const query = 'SELECT * FROM products WHERE pk_id_producto = ?';
@@ -49,5 +61,6 @@ module.exports = {
     createProduct,
     getAllProducts,
     getProductById,
-    deleteProductById
+    deleteProductById,
+    mailerService
 };
